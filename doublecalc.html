@@ -1,0 +1,507 @@
+<!doctype html>
+<html>
+    <!--
+        Double Displacement Calculator v2.0
+        Co-created with Kelly Lang, January 2019
+    -->
+    <head>
+    <style>
+            .rainbow {
+              -webkit-animation: rainbow 2s infinite; 
+              
+              -ms-animation: rainbow 2s infinite;
+              
+              animation: rainbow 2s infinite;
+              padding: 7px;
+            text-align: center;
+            background: #000;
+            }
+            @-webkit-keyframes rainbow{
+              0%{color: red;}	
+              10%{color: orange;}	
+            	20%{color: yellow;}
+            	30%{color:#00ce18;}
+            	40%{color: #009e76;}
+            	50%{color: #005c9e;}
+            	60%{color: blue;}
+            	70%{color: #7b00ff;}
+            	80%{color: #9100e0;}
+            	90%{color: #ca00d8;}
+            	100%{color: red;}
+            }
+            @-ms-keyframes rainbow{
+              0%{color: red;}	
+              10%{color: orange;}	
+            	20%{color: yellow;}
+            	30%{color:#00ce18;}
+            	40%{color: #009e76;}
+            	50%{color: #005c9e;}
+            	60%{color: blue;}
+            	70%{color: #7b00ff;}
+            	80%{color: #9100e0;}
+            	90%{color: #ca00d8;}
+            	100%{color: red;}	
+            }
+            @keyframes rainbow{
+              0%{color: red;}	
+              10%{color: orange;}	
+            	20%{color: yellow;}
+            	30%{color:#00ce18;}
+            	40%{color: #009e76;}
+            	50%{color: #005c9e;}
+            	60%{color: blue;}
+            	70%{color: #7b00ff;}
+            	80%{color: #9100e0;}
+            	90%{color: #ca00d8;}
+            	100%{color: red;}
+            }
+            a:link {
+                color: #7b00ff;
+            }
+            a:visited {
+                color: #7b00ff;
+            }
+            a:hover {
+                color: magenta;
+            }
+            a:active {
+                color: aqua;
+            }
+        </style>
+        </head>
+    <body>
+        <div class = 'rainbow'><font size = '5' face = 'courier new'><b><u>THE WORLD'S BEST DOUBLE DISPLACEMENT CALCULATOR</u></b> &#9786;</font></div>
+        <p><b>Version 2.0:</b> The bug update!</p>
+        <p>This program outputs a balanced double displacement reaction (with states) given two aqueous reactants.</p>
+        <p><b>New</b> in version 2.0: Major bug fixes.</p>
+        <b><div class = 'rainbow'><font size = '4' face = 'courier new'>INSTRUCTIONS:</font></div></b>
+        <p>Please enter the chemical formulae for two ionic compounds, in proper formatting, <u>WITHOUT COEFFICIENTS</u>. Please note that uncommon polyatomic ions may not work.</p>
+        Enter the reactants: 
+        <br/>
+        <input id='mol1' /> (aq) + 
+        <input id='mol2' /> (aq)  &#8594;
+        <button onclick='calc()'>Balance my equation!</button>
+        <p id='out'></p>
+        
+        <script>
+            var congrats = "<p><div class = 'rainbow'><font face = 'courier new'><b>Congratulations! Here's your equation!</b></font></div></p>";
+            var thanks = "<p><font color = #7b00ff size = '2'><b>Thanks for using the world's best double displacement calculator!";
+            var elements = [[0], ["H", 1], [0], 
+            ["Li", 1], ["Be", 2], [0], [0], ["N", -3], ["O", -2], ["F", -1], [0], 
+            ["Na", 1], ["Mg", 2], ["Al", 3], [0], ["P", -3], ["S", -2], ["Cl", -1], [0], 
+            ["K", 1], ["Ca", 2], ["Sc", 3], ["Ti", 3, 4], ["V", 5, 4], ["Cr", 3, 2], ["Mn", 2, 3, 4], ["Fe", 3, 2], ["Co", 2, 3], ["Ni", 2, 3], ["Cu", 2, 1], ["Zn", 2], ["Ga", 3], [0], [0], ["Se", -2], ["Br", -1], [0], 
+            ["Rb", 1], ["Sr", 2], ["Y", 3], ["Zr", 4], ["Nb", 3, 5], ["Mo", 2, 3], ["Tc", 7], ["Ru", 3, 4], ["Rh", 3, 4], ["Pd", 2, 4], ["Ag", 1], ["Cd", 2], ["In", 3], ["Sn", 4, 2], [0], [0], ["I", -1], [0], 
+            ["Cs", 1], ["Ba", 2], ["La", 3], ["Ce", 3, 4], ["Pr", 3, 4], ["Nd", 3], ["Pm", 3], ["Sm", 3, 4], ["Eu", 3, 2], ["Gd", 3], ["Tb", 3, 4], ["Dy", 3], ["Ho", 3], ["Er", 3], ["Tm", 3, 2], ["Yb", 3, 2], ["Lu", 3], ["Hf", 4], ["Ta", 5], ["W", 6], ["Re", 4, 7], ["Os", 3, 4], ["Ir", 3, 4], ["Pt",  4, 2], ["Au", 3, 1], ["Hg",  2, 1], ["Tl", 1, 3], ["Pb", 2, 4], ["Bi", 3, 5], [0], [0], [0],
+            ["Fr", 1], ["Ra", 2], ["Ac", 3], ["Th", 4], ["Pa", 5, 4], ["U", 6, 4, 5], ["Np", 5, 3, 4, 6], ["Pu", 4, 6, 3, 5], ["Am", 3, 4, 5, 6], ["Cm", 3], ["Bk", 3, 4], ["Cf", 3], ["Es", 3], ["Fm", 3], ["Md", 2, 3], ["No", 2, 3], ["Lr", 3]];
+            
+            var poly = [["PO4", -3], ["CO3", -2], ["SO4", -2], ["SO3", -2], ["OH", -1], ["NO3", -1]];
+            
+            var polyPrint = ["PO<sub>4</sub>", "CO<sub>3</sub>", "SO<sub>4</sub>", "SO<sub>3</sub>", "OH", "NO<sub>3</sub>"];
+           
+            function calc() {
+                document.getElementById('out').innerHTML = "";
+                
+                //Printing functions below
+                function dead (){
+                    document.getElementById('out').innerHTML += ("Something went wrong. Please read the instructions thoroughly, then check if everything is written correctly.");
+                }
+                
+                function water(){
+                    document.getElementById('out').innerHTML += ("Water is water. It can't be dissolved in water to form an aqueous solution. It's just water.");
+                }
+                
+                function sameElems (){
+                    document.getElementById('out').innerHTML += ("This reaction will not occur because the products and the reactants would be the same.");
+                }
+                
+                function oxygen (){
+                    document.getElementById('out').innerHTML += ("This reaction will not occur because oxides react with water and would not form an aqueous solution.");
+                }
+                
+                function badReactants (){
+                    document.getElementById('out').innerHTML += ("This reaction will not occur because one or both of your reactants are insoluble in water would not form an aqueous solution.");
+                }
+                
+                function aqueous (){
+                    document.getElementById('out').innerHTML += ("This reaction will not occur because both products would be aqueous solutions.");
+                }
+                
+                function endPrint(){
+                    document.getElementById('out').innerHTML += congrats;
+                    document.getElementById('out').innerHTML += thanks;
+                }
+                
+                var in1 = document.getElementById('mol1').value;
+                var in2 = document.getElementById('mol2').value;
+
+                var elems1 = [];
+                var elems2 = [];
+                
+                var deadYet = false;
+                
+                if(in1 == "H2O" || in2 == "H2O"){
+                    deadYet = true;
+                    water();
+                } else if(in1 == "" || in2 == ""){
+                    deadYet = true;
+                    dead();
+                }
+                
+                var isTrue = true;
+                var polyExists = false;
+                
+                
+                function splice(ins, elems) { //Splits input into array of elements
+                    var isPoly = false;
+                    var pooly;
+                    for (var i = 0; i<poly.length; i++){
+                        if(ins.indexOf(poly[i][0]) != -1) {
+                            pooly = poly[i][0];
+                            isPoly = true;
+                            polyExists = true;
+                        }
+                    }
+                    if(ins.charAt(0) == ins.charAt(0).toLowerCase()){
+                        isTrue = false;
+                        return;
+                    }
+                    for (var i = 0; i < ins.length; i++){
+                        if(ins.charAt(i) == "("){
+                            continue;
+                        }
+                        if (ins.charAt(i) == ins.charAt(i).toUpperCase() && isNaN(ins.charAt(i))) { //uppercase and not a number - start of an element
+                            if (isPoly == true && ins.charAt(i) == pooly.charAt(0) && ins.charAt(i+1) == pooly.charAt(1)){ //polyatomic ion is found
+                                    elems.push(pooly); //add the whole polyatomic ion to the array
+                                    if (ins.indexOf(")") > -1 && !isNaN((ins.indexOf(")") + 1))) { // there are exceptions where this doesn't work.
+                                        if(ins.indexOf("(") == -1){ //missing bracket
+                                            isTrue = false;
+                                        } else {
+                                          elems.push(ins.charAt(ins.indexOf(")") + 1)); //number of the polyatomic ion
+                                        }
+                                    } else { //only one of a polyatomic ion
+                                        elems.push(1);
+                                    }
+                                    break;
+                            } else if (ins.charAt(i+1) == ins.charAt(i+1).toLowerCase() && isNaN(ins.charAt(i+1))) { //lowercase and not a number - 2 letter element
+                                elems.push(ins.charAt(i) + ins.charAt(i+1));
+                                if (isNaN(ins.charAt(i+2)) || i+1 == ins.length-1) { //only one of an element
+                                    elems.push(1);
+                                }
+                            } else if (isNaN(ins.charAt(i+1)) || isNaN(ins.charAt(i)) && i == ins.length-1){ //only one of a one letter element
+                                elems.push(ins.charAt(i));
+                                elems.push(1);
+                            } else {
+                                elems.push(ins.charAt(i));
+                            }
+                        }
+                        if (!isNaN(ins.charAt(i)) && ins.charAt(i) != "(" && ins.charAt(i) != ")") {
+                            elems.push(ins.charAt(i));
+                        }
+                    }
+                }
+                
+                splice(in1, elems1);
+                splice(in2, elems2);
+                
+                if(isTrue == false && deadYet == false){
+                    deadYet = true;
+                    dead();
+                }
+                
+                var m1;
+                var nm1;
+                var m2;
+                var nm2;
+                
+            
+                function check(elems, dex) { //assigns elements to characteristics
+                    if (elems.length == 4) {
+                        for (var i = 0; i < elements.length; i++) {
+                            if(elements[i][0] == elems[dex]) {
+                                return elements[i];
+                                break;
+                            }
+                            if (i == elements.length-1 && elements[i][0] != elems[dex]) {
+                                for(var j = 0; j<poly.length; j++){
+                                    if(poly[j][0] == elems[dex]){
+                                        return poly[j];
+                                        break;
+                                    }
+                                    if(j == poly.length-1 && poly[j][0] != elems[dex]){
+                                        isTrue = false;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        isTrue = false;
+                    }
+                }
+                
+                m1 = check(elems1, 0);
+                nm1 = check(elems1, 2);
+                m2 = check(elems2, 0);
+                nm2 = check(elems2, 2);
+                
+                if((m1 == m2 || nm1 == nm2) && deadYet == false){
+                    deadYet = true;
+                    sameElems();
+                }
+                
+                if((nm1[0] == "O" || nm2[0] == "O") && deadYet == false){
+                    deadYet = true;
+                    oxygen();
+                } else if((nm1[0] == "N" || nm2[0] == "N") && deadYet == false){
+                    deadYet = true;
+                    badReactants();
+                } else if((nm1[0] == "P" || nm2[0] == "P") && deadYet == false){
+                    deadYet = true;
+                    badReactants();
+                }
+                
+                function checkbalance (elems, m, nm) { //returns the metal and its charge
+                    if (m.length == 2) { //not multivalent
+                        if(m[1]*elems[1] + nm[1]*elems[3] != 0){
+                            isTrue = false;
+                        } else {
+                            return m;
+                        }
+                    } else { //multivalent
+                        var multiTrue = false;
+                        for(var j = 0; j<m.length-1; j++){
+                            if(m[j+1]*elems[1] + nm[1]*elems[3] == 0){
+                                multiTrue = true;
+                                return [m[0], m[j+1]]; 
+                                break;
+                            }
+                        }
+                        if(!multiTrue){
+                            isTrue = false;
+                        }
+                    }
+                }
+                m1 = checkbalance(elems1, m1, nm1);
+                m2 = checkbalance(elems2, m2, nm2);
+                
+                if(m1[1]<1 || m2[1]<1 || nm1[1]>-1 || nm2[1]>-1){
+                    isTrue = false;
+                }
+                
+                if(isTrue == false && deadYet == false){
+                    deadYet = true;
+                    dead();
+                }
+                
+        
+                function products (m, nm){ //predicts what the products will be (balanced ionic compounds)
+                    var numNonmetals = 1;
+                    var numMetals = 1;
+                    if(m[1] + nm[1] != 0){                 
+                       numNonmetals = m[1];
+                       numMetals = Math.abs(nm[1]);
+                       for (var i = 2; i <= 3; i++) { //simplify
+                       		if (numNonmetals % i == 0 && numMetals % i == 0){
+                            	numNonmetals /= i;
+                       			numMetals /= i;
+                            }
+                       }
+                    } 
+                    return [m[0], numMetals, nm[0], numNonmetals];
+                }
+                
+                var prod1 = products(m1, nm2);
+                var prod2 = products(m2, nm1);
+                
+                var solubility = [[["F"], [true], ["Cu", 1], ["Ag", 1], ["Pb", 2], ["Hg", 2]], [["S"], [false], ["H", 1], ["Li", 1], ["Na", 1], ["K", 1], ["Rb", 1], ["Cs", 1], ["Fr", 1], ["Be", 2], ["Mg", 2], ["Ca", 2], ["Sr", 2], ["Ba", 2], ["Ra", 2]], [["Cl"], [true], ["Cu", 1], ["Ag", 1], ["Pb", 2], ["Hg", 2]], [["I"], [true], ["Cu", 1], ["Ag", 1], ["Pb", 2], ["Hg", 2]], [["Br"], [true], ["Cu", 1], ["Ag", 1], ["Pb", 2], ["Hg", 2]], [["NO3"], [true]], [["SO4"], [true], ["Ca", 2], ["Ba", 2], ["Sr", 2], ["Hg", 2], ["Pb", 2], ["Ag", 1]], [["CO3"], [false], ["H", 1], ["Li", 1], ["Na", 1], ["K", 1], ["Rb", 1], ["Cs", 1], ["Fr", 1]], [["PO4"], [false], ["H", 1], ["Li", 1], ["Na", 1], ["K", 1], ["Rb", 1], ["Cs", 1], ["Fr", 1]], [["OH"], [false], ["H", 1], ["Li", 1], ["Na", 1], ["K", 1], ["Rb", 1], ["Cs", 1], ["Fr", 1], ["Ca", 2], ["Ba", 2], ["Sr", 2]], [["SO3"], [true]]];
+                //3D Array: non-metal (one array index of an array), boolean (soluble or not - one array index of an array), exceptions
+                
+                function checkSolubility (m, nm){ //returns whether compounds are soluble or not
+	                var soluble = true;
+                	for(var i = 0; i<solubility.length; i++){
+                		if(nm[0] == solubility[i][0][0]){
+                			if(solubility[i][1][0] == true){ //generally soluble
+                				for(var j = 2; j<solubility[i].length; j++){
+                					if(m[0] == solubility[i][j][0] && m[1] == solubility[i][j][1]){ //something died here
+                						soluble = false;
+                						break;
+                					}
+                				}
+                			} else { //generally insoluble
+                				soluble = false;
+                				for(var j = 2; j<solubility[i].length; j++){
+                					if(m[0] == solubility[i][j][0] && m[1] == solubility[i][j][1]){ //something also died here
+                						soluble = true;
+                					}
+                				}
+                			}
+                		}
+                	}
+                	if(soluble == false){
+                	    return false;
+                	} else {
+                	    return true;
+                	}
+                }
+                
+                //checking the reactants' solubilities
+                var sol1 = checkSolubility(m1, nm1);
+                var sol2 = checkSolubility(m2, nm2);
+                
+                if((!sol1 || !sol2) && deadYet == false){
+                    deadYet = true;
+                    badReactants();
+                }
+                
+                //BALANCING
+                //coefficients as fractions for now: [numerator, denominator]
+                var coeff1 = [1, 1];
+                var coeff2;
+                var coeff3;
+                var coeff4;
+                
+                /*ALGEBRA NOTES
+                sub1 * coeff1 = sub5 * coeff3
+                sub2 * coeff1 = sub6 * coeff4
+                sub3 * coeff2 = sub7 * coeff4
+                sub4 * coeff2 = sub8 * coeff3
+                */
+                
+                coeff3 = [elems1[1]*(coeff1[0]/coeff1[1]), prod1[1]];
+                coeff4 = [elems1[3]*(coeff1[0]/coeff1[1]), prod2[3]];
+                coeff2 = [prod2[1]*(coeff4[0]/coeff4[1]), elems2[1]];
+                
+                function reciprocals (coeff){
+                    if(coeff[0]%coeff[1] == 0 && Number.isInteger(coeff[0])){ //integer coeff
+                        return coeff[0];
+                    } else if(coeff[0]%coeff[1] == 0){
+                        coeff[0] = 1/coeff[0];
+                        coeff[1] = 1/coeff[0];
+                        return (coeff[1]/coeff[0]);
+                    } else if(coeff[0] > coeff[1]){ //larger numerator than denom
+                        return coeff[1];
+                    } else { //fraction
+                        return (coeff[1]/coeff[0]);
+                    }
+                }
+                
+                var totalMultiply = reciprocals(coeff1)*reciprocals(coeff2)*reciprocals(coeff3)*reciprocals(coeff4);
+                
+                coeff1 = (coeff1[0]/coeff1[1])*totalMultiply;
+                coeff2 = (coeff2[0]/coeff2[1])*totalMultiply;
+                coeff3 = (coeff3[0]/coeff3[1])*totalMultiply;
+                coeff4 = (coeff4[0]/coeff4[1])*totalMultiply;
+                
+                for(var i = Math.min(Math.min(coeff1, coeff2), Math.min(coeff3, coeff4)); i>1; i--){
+                    if(coeff1%i == 0 && coeff2%i == 0 && coeff3%i == 0 && coeff4%i == 0){
+                        coeff1/=i;
+                        coeff2/=i;
+                        coeff3/=i;
+                        coeff4/=i;
+                    }
+                }
+                
+                function nocoeffs(coeff){ //if coefficient is 1 just get rid of it now
+                    if(coeff == 1){
+                        return "";
+                    } else {
+                        return coeff;
+                    }
+                }
+                
+                coeff1 = nocoeffs(coeff1);
+                coeff2 = nocoeffs(coeff2);
+                coeff3 = nocoeffs(coeff3);
+                coeff4 = nocoeffs(coeff4);
+                
+                var state1 = checkSolubility(m1, nm2);
+                var state2 = checkSolubility(m2, nm1);
+                
+                function states(whichState, prod){
+                    if(whichState == false){
+                        return "s";
+                    } else {
+                        if(prod[0] == "H" && (prod[2] == "S" || prod[2] == "SO3" || prod[2] == "CO3")){
+                            return "g";
+                        } else if (prod[0] == "H" && prod[2] == "OH"){
+                            prod[1] = 2;
+                            prod[2] = "O";
+                            prod[3] = 1;
+                            return "&#8467;"; //cursive l
+                        } else {
+                            return "aq";
+                        }
+                    }
+                }
+                
+                state1 = states(state1, prod1);
+                state2 = states(state2, prod2);
+                
+                if(state1 == "aq" && state2 == "aq" && deadYet == false){
+                    deadYet = true;
+                    aqueous();
+                }
+                
+                function nosubs(sub){ //gets rid of subscripts of 1
+                    if(sub == 1){
+                        return "";
+                    } else {
+                        return sub;
+                    }
+                }
+                
+                elems1[1] = nosubs(elems1[1]);
+                elems1[3] = nosubs(elems1[3]);
+                elems2[1] = nosubs(elems2[1]);
+                elems2[3] = nosubs(elems2[3]);
+                prod1[1] = nosubs(prod1[1]);
+                prod1[3] = nosubs(prod1[3]);
+                prod2[1] = nosubs(prod2[1]);
+                prod2[3] = nosubs(prod2[3]);
+                
+                function polySub (thing){
+                    var myPoly = thing[2];
+                    if(polyExists == true) {
+                        for(var i = 0; i < poly.length; i++) {
+                            if (thing[2] == poly[i][0]) {
+                                myPoly = polyPrint[i];
+                                if(thing[3] != "") {
+                                    myPoly = "(" + myPoly + ")";
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    return myPoly;
+                }
+                
+                elems1[2] = polySub(elems1);
+                elems2[2] = polySub(elems2);
+                prod1[2] = polySub(prod1);
+                prod2[2] = polySub(prod2);
+                
+                function output(){
+                    if(state1 != "g" && state2 != "g" || (prod1[0] == "H" && prod1[2] == "S" || prod2[0] == "H" && prod2[2] == "S")){ //no gases except H2S
+                        document.getElementById('out').innerHTML = (coeff1+elems1[0]+"<sub>"+elems1[1]+"</sub>"+elems1[2]+"<sub>"+elems1[3]+"</sub> (aq) + "+coeff2+elems2[0]+"<sub>"+elems2[1]+"</sub>"+elems2[2]+"<sub>"+elems2[3]+"</sub> (aq) &#8594; "+coeff3+prod1[0]+"<sub>"+prod1[1]+"</sub>"+prod1[2]+"<sub>"+prod1[3]+"</sub> ("+state1+") + "+coeff4+prod2[0]+"<sub>"+prod2[1]+"</sub>"+prod2[2]+"<sub>"+prod2[3]+"</sub> ("+state2+")");
+                    } else { //if there is a gas
+                        if(prod1[2] == "CO<sub>3</sub>"){
+                            document.getElementById('out').innerHTML = (coeff1+elems1[0]+"<sub>"+elems1[1]+"</sub>"+elems1[2]+"<sub>"+elems1[3]+"</sub> (aq) + "+coeff2+elems2[0]+"<sub>"+elems2[1]+"</sub>"+elems2[2]+"<sub>"+elems2[3]+"</sub> (aq) &#8594; "+coeff3+"H<sub>2</sub>O (&#8467;) + "+coeff3+"CO<sub>2</sub> (g) + "+coeff4+prod2[0]+"<sub>"+prod2[1]+"</sub>"+prod2[2]+"<sub>"+prod2[3]+"</sub> ("+state2+")");
+                        } else if(prod2[2] == "CO<sub>3</sub>"){
+                            document.getElementById('out').innerHTML = (coeff1+elems1[0]+"<sub>"+elems1[1]+"</sub>"+elems1[2]+"<sub>"+elems1[3]+"</sub> (aq) + "+coeff2+elems2[0]+"<sub>"+elems2[1]+"</sub>"+elems2[2]+"<sub>"+elems2[3]+"</sub> (aq) &#8594; "+coeff3+prod1[0]+"<sub>"+prod1[1]+"</sub>"+prod1[2]+"<sub>"+prod1[3]+"</sub> ("+state1+") + "+coeff4+"H<sub>2</sub>O (&#8467;) + "+coeff4+"CO<sub>2</sub> (g)");
+                        } else if(prod1[2] == "SO<sub>3</sub>"){
+                            document.getElementById('out').innerHTML = (coeff1+elems1[0]+"<sub>"+elems1[1]+"</sub>"+elems1[2]+"<sub>"+elems1[3]+"</sub> (aq) + "+coeff2+elems2[0]+"<sub>"+elems2[1]+"</sub>"+elems2[2]+"<sub>"+elems2[3]+"</sub> (aq) &#8594; "+coeff3+"H<sub>2</sub>O (&#8467;) + "+coeff3+"SO<sub>2</sub> (g) + "+coeff4+prod2[0]+"<sub>"+prod2[1]+"</sub>"+prod2[2]+"<sub>"+prod2[3]+"</sub> ("+state2+")");
+                        } else if(prod2[2] == "SO<sub>3</sub>"){
+                            document.getElementById('out').innerHTML = (coeff1+elems1[0]+"<sub>"+elems1[1]+"</sub>"+elems1[2]+"<sub>"+elems1[3]+"</sub> (aq) + "+coeff2+elems2[0]+"<sub>"+elems2[1]+"</sub>"+elems2[2]+"<sub>"+elems2[3]+"</sub> (aq) &#8594; "+coeff3+prod1[0]+"<sub>"+prod1[1]+"</sub>"+prod1[2]+"<sub>"+prod1[3]+"</sub> ("+state1+") + "+coeff4+"H<sub>2</sub>O (&#8467;) + "+coeff4+"SO<sub>2</sub> (g)");
+                        }
+                    }
+                    endPrint();
+                }
+                
+                if(deadYet == false){
+                    output();
+                }
+            }
+            
+        </script>
+    </body>
+
+</html>
